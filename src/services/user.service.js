@@ -14,7 +14,6 @@ export async function createUser(newUser) {
   try {
     const result = await validateUser(newUser);
     if (result.error) {
-      console.log(result);
       return result;
     }
     const user = await prisma.user.create({
@@ -26,7 +25,7 @@ export async function createUser(newUser) {
 
     return user;
   } catch (error) {
-    return { error: error.message };        
+    return { error };        
   }
 };
 
@@ -40,7 +39,7 @@ export async function getUser(field, value) {
     where: { [field]: value }
   });
 
-  if (!user) return { error: "User not found" };
+  if (!user) return { error: "Usuário não encontrado." };
 
   return user;
 };
@@ -69,7 +68,7 @@ export async function deleteUser(id) {
       where: { id }
     });
 
-    return { message: "User deleted" };
+    return { message: "Usuário deletado com sucesso!" };
   } catch (error) {
     return { error: error.message };
   }
@@ -77,14 +76,14 @@ export async function deleteUser(id) {
 
 async function validateUser(newUser) {
   if (!newUser.name || !newUser.email || !newUser.type || !newUser.password) {
-    return { error: "Missing fields" };
+    return { error: "Campos obrigatórios não preenchidos." };
   }
 
   let user = await getUser("email", newUser.email);
   if (!user.error) {
-    return { error: "User already exists" };
+    return { error: "O endereço de e-mail já está registrado." };
   }
-
+  return { error: null };
   // Se o campo type for um enum, adicionar a validação
 }
   

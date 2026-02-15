@@ -13,13 +13,13 @@ async function createUser(req, res) {
 
   const { name, email, type, password } = req.body;
 
-  const user = await userService.createUser({ name, email, type, password });
+  const token = await userService.createUser({ name, email, type, password });
 
-  if (user.error) {
-    return res.status(400).json(user);
+  if (token.error) {
+    return res.status(400).json({ error: token.error });
   }
 
-  res.status(201).json(user);
+  res.status(201).json(token);
 };
 
 async function getUsers(req, res) {

@@ -26,6 +26,8 @@ cd test-sps-server
 
 npm install
 
+docker compose up -d
+
 npx prisma migrate dev
 
 npm run dev
