@@ -1,0 +1,16 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: test-sps-db-aaaaaaaaaa
+    environment:
+      POSTGRES_DB: test-sps-container-db
+      POSTGRES_USER: test-sps-user
+      POSTGRES_PASSWORD: test-sps-password
+    ports:
+      - "5432:5432"
+    volumes:
+      - test-sps-volumea:/var/lib/postgresql/data
+
+volumes:
+  test-sps-volumea:
+
