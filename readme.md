@@ -33,3 +33,7 @@ npx prisma migrate dev
 npx prisma db seed
 
 npm run dev
+
+
+Obs: Adicionei um commit após a entrega do teste, nome do commit: feature/tratando mensagem de erro para update de user com um e-mail existente.
+Tempo gasto 20 minutos.

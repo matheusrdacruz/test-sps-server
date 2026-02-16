@@ -46,6 +46,11 @@ export async function getUser(field, value) {
 
 export async function updateUser(id, data) {
   try {
+    const result = await validateUpdateUser(id, data);
+    if (result.error) {
+      return result;
+    }
+
     let user = await getUser("id", id);
     if (user.error) {
       return user;
@@ -83,7 +88,21 @@ async function validateUser(newUser) {
   if (!user.error) {
     return { error: "O endereço de e-mail já está registrado." };
   }
-  return { error: null };
   // Se o campo type for um enum, adicionar a validação
+  return { error: null };
 }
-  
+
+async function validateUpdateUser(id, data) {
+  if (!data.name || !data.email || !data.type) {
+    return { error: "Campos obrigatórios não preenchidos." };
+  }
+
+  let user = await prisma.user.findFirst({
+    where: { email: data.email, id: { not: id } }
+  });
+  if (user) {
+    return { error: "O endereço de e-mail já está registrado." };
+  }
+  // Se o campo type for um enum, adicionar a validação
+  return { error: null };
+}
