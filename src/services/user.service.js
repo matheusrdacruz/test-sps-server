@@ -1,12 +1,16 @@
 import prisma from '../prisma/client.js';
 import bcrypt from "bcryptjs";
+import fs from 'fs/promises';
+import path from 'path';
 
 export default {
   createUser,
   getUsers,
   getUser,
   updateUser,
-  deleteUser
+  deleteUser,
+  uploadAvatar,
+  getUserDocuments
 };
 
 export async function createUser(newUser) {
@@ -105,4 +109,60 @@ async function validateUpdateUser(id, data) {
   }
   // Se o campo type for um enum, adicionar a validação
   return { error: null };
+}
+
+async function uploadAvatar(id, file) {
+  if (!file) {
+    return { error: "Imagem não enviada" };
+  }
+
+  const avatarUrl = `/files/avatars/${file.filename}`;
+
+  try {
+    let user = await getUser("id", id);
+    if (user.error) return user;
+
+    await deleteAvatar(user.avatarUrl);
+
+    const updatedUser = await prisma.user.update({
+      where: { id: Number(id) },
+      data: { avatarUrl },
+    });
+
+    return updatedUser;
+  } catch (error) {
+    return { error: error.message };
+  }
+}
+
+async function deleteAvatar(avatarUrl) {
+  if (!avatarUrl) return;
+
+  try {
+    // transforma /files/avatars/xxx.png
+    // em uploads/avatars/xxx.png
+    const relativePath = avatarUrl.replace('/files', 'uploads');
+
+    const filePath = path.join(process.cwd(), relativePath);
+
+    await fs.unlink(filePath);
+
+    console.log('Avatar antigo deletado com sucesso');
+  } catch (error) {
+    if (error.code !== 'ENOENT') {
+      console.error('Erro ao deletar avatar:', error);
+    }
+  }
+}
+
+async function getUserDocuments(id) {
+  try {
+    const documents = await prisma.document.findMany({
+      where: { userId: id }
+    });
+    return documents;
+  } catch (error) {
+    console.error(error);
+    return { error: error.message };
+  }
 }

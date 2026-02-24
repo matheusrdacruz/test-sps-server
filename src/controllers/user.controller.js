@@ -6,7 +6,8 @@ export default {
   getUsers,
   getUser,
   updateUser,
-  deleteUser
+  deleteUser,
+  uploadAvatar
 }
 
 async function createUser(req, res) {
@@ -63,3 +64,15 @@ async function deleteUser(req, res) {
 
   res.json(user);
 };
+
+async function uploadAvatar(req, res) {
+  const { id } = req.params;
+
+  const user = await userService.uploadAvatar(Number(id), req.file);
+
+  if (user.error) {
+    return res.status(400).json({ error: user.error });
+  }
+
+  res.json(user);
+}
